@@ -10,7 +10,12 @@ import {
 } from "react-icons/fi";
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -22,22 +27,22 @@ export default function Contact() {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    setSuccess("");
     setError("");
+    setSuccess("");
 
     try {
       await emailjs.send(
-        "service_0b3btaq",       // your service id
-        "template_am0d9ym",      // your template id
+        "service_0b3btaq",      // 🔁 replace with yours
+        "template_am0d9ym",     // 🔁 replace with yours
         {
           name: form.name,
           email: form.email,
           message: form.message,
         },
-        "yMyr28wpaE5fb8i-f"      // your public key
+        "yMyr28wpaE5fb8i-f"      // 🔁 replace with yours
       );
 
-      setSuccess("Message sent successfully. We'll contact you soon.");
+      setSuccess("Message sent successfully. We’ll contact you soon!");
       setForm({ name: "", email: "", message: "" });
     } catch {
       setError("Failed to send message. Please try again.");
@@ -47,146 +52,134 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-28 flex items-center justify-center overflow-hidden">
-      {/* BACKGROUND GLOW */}
-      <div className="absolute -top-40 -right-40 w-[500px] h-[500px]
-                      bg-pink-600/20 blur-[160px] rounded-full" />
-      <div className="absolute bottom-0 -left-40 w-[400px] h-[400px]
-                      bg-purple-600/20 blur-[160px] rounded-full" />
+    <section className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-24">
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-      <div className="relative w-full max-w-6xl grid md:grid-cols-2 gap-14 items-center">
         {/* LEFT CONTENT */}
-        <div className="animate-fade-up">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+        <div className="text-center md:text-left animate-fade-up">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Let’s <span className="text-pink-500">Connect</span>
           </h1>
 
-          <p className="text-gray-400 text-lg max-w-md">
+          <p className="text-gray-400 text-lg max-w-md mx-auto md:mx-0">
             Promote your business, collaborate with us, or ask anything.
             We respond fast and personally.
           </p>
         </div>
 
-        {/* FORM */}
-        <form
-          onSubmit={handleSubmit}
-          className="animate-fade-up delay-150
-                     bg-white/5 backdrop-blur-xl
-                     border border-white/10
-                     rounded-3xl p-8 md:p-10 space-y-6 shadow-xl"
-        >
-          {/* NAME */}
-          <Field
-            label="Your Name"
-            icon={<FiUser />}
-            input={
-              <input
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                placeholder="John Doe"
-              />
-            }
-          />
+        {/* FORM CARD */}
+        <div className="relative animate-fade-up delay-150">
+          {/* glow */}
+          <div className="absolute inset-0 bg-pink-500/10 blur-2xl rounded-3xl" />
 
-          {/* EMAIL */}
-          <Field
-            label="Email Address"
-            icon={<FiMail />}
-            input={
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                placeholder="you@example.com"
-              />
-            }
-          />
-
-          {/* MESSAGE */}
-          <Field
-            label="Message"
-            icon={<FiMessageSquare />}
-            textarea
-            input={
-              <textarea
-                name="message"
-                value={form.message}
-                onChange={handleChange}
-                rows="4"
-                required
-                placeholder="Tell us about your business..."
-              />
-            }
-          />
-
-          {/* STATUS */}
-          {success && (
-            <Status
-              icon={<FiCheckCircle />}
-              text={success}
-              color="text-green-400"
-            />
-          )}
-
-          {error && (
-            <Status
-              icon={<FiAlertCircle />}
-              text={error}
-              color="text-red-400"
-            />
-          )}
-
-          {/* BUTTON */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="group w-full flex items-center justify-center gap-3
-                       py-3.5 rounded-full bg-pink-600 font-semibold
-                       transition-all duration-300
-                       hover:bg-pink-700 hover:scale-[1.02]
-                       hover:shadow-[0_0_30px_rgba(236,72,153,0.6)]
-                       disabled:opacity-60 disabled:scale-100"
+          <form
+            onSubmit={handleSubmit}
+            className="relative w-full bg-white/5 backdrop-blur-xl
+                       border border-white/10 rounded-3xl
+                       p-6 sm:p-8 space-y-6"
           >
-            {loading ? "Sending..." : "Send Message"}
-            {!loading && (
-              <FiSend className="transition group-hover:translate-x-1" />
+            {/* NAME */}
+            <InputField
+              label="Your Name"
+              icon={<FiUser />}
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="John Doe"
+            />
+
+            {/* EMAIL */}
+            <InputField
+              label="Email Address"
+              icon={<FiMail />}
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+            />
+
+            {/* MESSAGE */}
+            <TextAreaField
+              label="Message"
+              icon={<FiMessageSquare />}
+              name="message"
+              value={form.message}
+              onChange={handleChange}
+              placeholder="Tell us about your business…"
+            />
+
+            {/* STATUS */}
+            {success && (
+              <Status
+                icon={<FiCheckCircle />}
+                text={success}
+                color="text-green-400"
+              />
             )}
-          </button>
-        </form>
+
+            {error && (
+              <Status
+                icon={<FiAlertCircle />}
+                text={error}
+                color="text-red-400"
+              />
+            )}
+
+            {/* SUBMIT */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2
+                         py-3 rounded-full bg-pink-600
+                         hover:bg-pink-700 transition
+                         font-semibold
+                         disabled:opacity-60"
+            >
+              {loading ? "Sending..." : "Send Message"}
+              {!loading && <FiSend />}
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ================= COMPONENTS ================= */
+
+function InputField({ label, icon, ...props }) {
+  return (
+    <div>
+      <label className="text-sm text-gray-300">{label}</label>
+      <div className="flex items-center gap-3 mt-2
+                      bg-black/40 border border-white/10
+                      rounded-lg px-4">
+        {icon}
+        <input
+          {...props}
+          required
+          className="w-full bg-transparent py-3 outline-none text-sm"
+        />
       </div>
     </div>
   );
 }
 
-/* ================= SUB COMPONENTS ================= */
-
-function Field({ label, icon, input, textarea }) {
+function TextAreaField({ label, icon, ...props }) {
   return (
     <div>
       <label className="text-sm text-gray-300">{label}</label>
-      <div
-        className="mt-2 flex gap-3 items-start
-                   bg-black/40 border border-white/10
-                   rounded-xl px-4 py-3
-                   focus-within:border-pink-500/50
-                   transition"
-      >
-        <span className="text-gray-400 mt-1">{icon}</span>
-        {textarea ? (
-          <textarea
-            className="w-full bg-transparent outline-none resize-none text-sm"
-            {...input.props}
-          />
-        ) : (
-          <input
-            className="w-full bg-transparent outline-none text-sm"
-            {...input.props}
-          />
-        )}
+      <div className="flex gap-3 mt-2 bg-black/40
+                      border border-white/10
+                      rounded-lg px-4 py-3">
+        {icon}
+        <textarea
+          {...props}
+          rows="4"
+          required
+          className="w-full bg-transparent outline-none text-sm resize-none"
+        />
       </div>
     </div>
   );

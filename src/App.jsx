@@ -39,7 +39,7 @@ function AppContent() {
       <Navbar />
 
       {/* Page Content */}
-      <div className="pt-24">
+      <div>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/chat" element={<VideoChat />} />
