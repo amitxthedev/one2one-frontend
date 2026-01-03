@@ -30,7 +30,7 @@ export default function Navbar() {
             {/* BRAND */}
             <span className="text-xl font-bold tracking-wide text-pink-500
                              hover:text-pink-400 transition">
-              One2One
+              MeowHub
             </span>
 
             {/* ONLINE TEXT (SMALL, OPTIONAL) */}
