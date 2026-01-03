@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import Promotions from "../components/Promotions";
 import Hero from "../components/landing/Hero";
 import Footer from "../components/Footer";
+import CelebrationLayer from "../components/celebrations/CelebrationLayer";
 
 export default function Landing() {
   const sectionsRef = useRef([]);
@@ -25,6 +26,8 @@ export default function Landing() {
 
   return (
     <div className="text-white bg-black overflow-hidden">
+      <CelebrationLayer />
+
       {/* HERO (no animation needed, first view) */}
       <Hero />
 

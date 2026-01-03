@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Stats from "./Stats";
+import { FiVideo, FiBriefcase, FiMessageCircle } from "react-icons/fi";
 
 export default function Hero() {
   return (
@@ -11,10 +12,29 @@ export default function Hero() {
       />
 
       <div className="relative max-w-4xl text-center">
+
+        {/* 🐱 MEOWHUB SVG */}
+        <div className="flex justify-center mb-4 animate-fade-up">
+          <img
+            src="/meowhub.svg"
+            alt="MeowHub"
+            className="w-28 md:w-36
+                       drop-shadow-[0_0_30px_rgba(236,72,153,0.35)]"
+          />
+        </div>
+
+        {/* ICON TAGLINE */}
+        <div className="flex items-center justify-center gap-2 mb-4
+                        text-pink-400 text-sm tracking-wide
+                        animate-fade-up delay-75">
+          <FiMessageCircle />
+          <span>Live One-to-One Conversations</span>
+        </div>
+
         {/* HEADING */}
         <h1
           className="text-4xl md:text-6xl font-extrabold mb-5 leading-tight
-                     animate-fade-up"
+                     animate-fade-up delay-100"
         >
           Talk to <span className="text-pink-500">Real People</span>
           <br />
@@ -24,7 +44,7 @@ export default function Hero() {
         {/* SUBTEXT */}
         <p
           className="text-gray-400 text-lg mb-8
-                     animate-fade-up delay-100"
+                     animate-fade-up delay-200"
         >
           One-to-one private video chats.
           <br className="hidden sm:block" />
@@ -34,30 +54,34 @@ export default function Hero() {
         {/* CTA BUTTONS */}
         <div
           className="flex flex-col sm:flex-row gap-4 justify-center mb-8
-                     animate-fade-up delay-200"
+                     animate-fade-up delay-300"
         >
           <Link
             to="/chat"
-            className="px-10 py-4 rounded-full bg-pink-600
+            className="flex items-center justify-center gap-2
+                       px-10 py-4 rounded-full bg-pink-600
                        font-semibold transition-all
                        hover:bg-pink-700 hover:scale-105
                        hover:shadow-[0_0_35px_rgba(236,72,153,0.6)]"
           >
+            <FiVideo className="text-lg" />
             Get Started
           </Link>
 
           <Link
             to="/contact"
-            className="px-10 py-4 rounded-full border border-white/20
+            className="flex items-center justify-center gap-2
+                       px-10 py-4 rounded-full border border-white/20
                        text-gray-200 transition
                        hover:bg-white/10 hover:border-white/40"
           >
+            <FiBriefcase className="text-lg" />
             Promote Your Business
           </Link>
         </div>
 
         {/* STATS */}
-        <div className="animate-fade-up delay-300">
+        <div className="animate-fade-up delay-500">
           <Stats />
         </div>
       </div>
