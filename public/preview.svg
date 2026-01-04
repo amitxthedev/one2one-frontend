@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#050505"></rect>
+
+  <!-- Cat ears -->
+  <path d="M18 22 L10 10 L22 14 Z" fill="#ec4899"></path>
+  <path d="M46 22 L54 10 L42 14 Z" fill="#ec4899"></path>
+
+  <!-- Cat face -->
+  <circle cx="32" cy="34" r="16" fill="#111"></circle>
+
+  <!-- Eyes -->
+  <circle cx="26" cy="34" r="3" fill="#ec4899"></circle>
+  <circle cx="38" cy="34" r="3" fill="#ec4899"></circle>
+
+  <!-- Nose -->
+  <path d="M32 38 L30 41 H34 Z" fill="#ec4899"></path>
+</svg>
