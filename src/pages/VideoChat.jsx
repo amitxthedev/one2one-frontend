@@ -18,8 +18,8 @@ const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 export default function VideoChat() {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerRef = useRef(null);
   const socketRef = useRef(null);
+  const peerRef = useRef(null);
   const localStreamRef = useRef(null);
 
   const [status, setStatus] = useState("connecting");
@@ -30,12 +30,12 @@ export default function VideoChat() {
   /* ================= INIT ================= */
 
   useEffect(() => {
-    start();
+    init();
     return cleanup;
     // eslint-disable-next-line
   }, []);
 
-  async function start() {
+  async function init() {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
@@ -45,7 +45,9 @@ export default function VideoChat() {
     localVideoRef.current.srcObject = stream;
     await localVideoRef.current.play().catch(() => {});
 
-    socketRef.current = io(SOCKET_URL);
+    socketRef.current = io(SOCKET_URL, {
+      transports: ["websocket"],
+    });
 
     socketRef.current.on("connect", async () => {
       setStatus("finding");
@@ -54,18 +56,20 @@ export default function VideoChat() {
       socketRef.current.emit("find-partner");
     });
 
-    socketEvents();
+    registerSocketEvents();
   }
 
   /* ================= SOCKET EVENTS ================= */
 
-  function socketEvents() {
-    socketRef.current.on("waiting", () => {
+  function registerSocketEvents() {
+    const socket = socketRef.current;
+
+    socket.on("waiting", () => {
       setStatus("waiting");
       setPartnerInfo(null);
     });
 
-    socketRef.current.on("partner-found", async ({ initiator, partner }) => {
+    socket.on("partner-found", async ({ initiator, partner }) => {
       setPartnerInfo(partner);
       setStatus("connected");
 
@@ -74,30 +78,34 @@ export default function VideoChat() {
       if (initiator) {
         const offer = await peerRef.current.createOffer();
         await peerRef.current.setLocalDescription(offer);
-        socketRef.current.emit("offer", offer);
+        socket.emit("offer", offer);
       }
     });
 
-    socketRef.current.on("offer", async (offer) => {
+    socket.on("offer", async (offer) => {
       await createPeer();
       await peerRef.current.setRemoteDescription(offer);
 
       const answer = await peerRef.current.createAnswer();
       await peerRef.current.setLocalDescription(answer);
-      socketRef.current.emit("answer", answer);
+      socket.emit("answer", answer);
     });
 
-    socketRef.current.on("answer", async (answer) => {
+    socket.on("answer", async (answer) => {
+      if (!peerRef.current) return;
       await peerRef.current.setRemoteDescription(answer);
     });
 
-    socketRef.current.on("ice-candidate", (candidate) => {
-      peerRef.current?.addIceCandidate(candidate);
+    socket.on("ice-candidate", async (candidate) => {
+      try {
+        await peerRef.current?.addIceCandidate(candidate);
+      } catch {}
     });
 
-    socketRef.current.on("partner-left", () => {
-      resetCall();
-      socketRef.current.emit("find-partner");
+    socket.on("partner-left", () => {
+      resetPeer();
+      setStatus("finding-new");
+      socket.emit("find-partner");
     });
   }
 
@@ -106,68 +114,80 @@ export default function VideoChat() {
   async function createPeer() {
     if (peerRef.current) return;
 
-    peerRef.current = new RTCPeerConnection({
+    const peer = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
+    peerRef.current = peer;
+
     localStreamRef.current.getTracks().forEach((track) => {
-      peerRef.current.addTrack(track, localStreamRef.current);
+      peer.addTrack(track, localStreamRef.current);
     });
 
-    peerRef.current.ontrack = (event) => {
-      const stream = event.streams[0];
+    peer.ontrack = (e) => {
+      const stream = e.streams[0];
       if (!stream) return;
       remoteVideoRef.current.srcObject = stream;
       remoteVideoRef.current.play().catch(() => {});
     };
 
-    peerRef.current.onicecandidate = (event) => {
-      if (event.candidate) {
-        socketRef.current.emit("ice-candidate", event.candidate);
+    peer.onicecandidate = (e) => {
+      if (e.candidate) {
+        socketRef.current.emit("ice-candidate", e.candidate);
       }
     };
-  }
 
-  /* ================= MEDIA CONTROLS ================= */
-
-  function toggleMic() {
-    localStreamRef.current
-      ?.getAudioTracks()
-      .forEach((track) => (track.enabled = !micOn));
-    setMicOn(!micOn);
-  }
-
-  function toggleCamera() {
-    localStreamRef.current
-      ?.getVideoTracks()
-      .forEach((track) => (track.enabled = !cameraOn));
-    setCameraOn(!cameraOn);
+    peer.onconnectionstatechange = () => {
+      if (peer.connectionState === "failed") {
+        socketRef.current.emit("skip");
+        resetPeer();
+      }
+    };
   }
 
   /* ================= CONTROLS ================= */
 
   function skipPartner() {
     socketRef.current.emit("skip");
-    resetCall();
+    resetPeer();
+    setStatus("finding-new");
   }
 
-  function resetCall() {
-    setStatus("finding-new");
-    peerRef.current?.close();
-    peerRef.current = null;
+  function resetPeer() {
+    if (peerRef.current) {
+      peerRef.current.getSenders().forEach((s) => s.track?.stop());
+      peerRef.current.close();
+      peerRef.current = null;
+    }
 
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
     }
+
+    setPartnerInfo(null);
+  }
+
+  function toggleMic() {
+    localStreamRef.current
+      ?.getAudioTracks()
+      .forEach((t) => (t.enabled = !micOn));
+    setMicOn(!micOn);
+  }
+
+  function toggleCamera() {
+    localStreamRef.current
+      ?.getVideoTracks()
+      .forEach((t) => (t.enabled = !cameraOn));
+    setCameraOn(!cameraOn);
   }
 
   function cleanup() {
     socketRef.current?.disconnect();
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
-    peerRef.current?.close();
+    resetPeer();
   }
 
-  /* ================= STATUS CONFIG ================= */
+  /* ================= STATUS ================= */
 
   const statusMap = {
     connecting: { icon: FiLoader, text: "Connecting…" },
@@ -183,10 +203,8 @@ export default function VideoChat() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* VIDEO AREA */}
-      <div className="flex-1 relative flex items-center justify-center bg-black">
-        {/* REMOTE VIDEO */}
-        <div className="h-full max-h-[80vh] aspect-[9/14] bg-black rounded-2xl overflow-hidden shadow-2xl relative">
+      <div className="flex-1 relative flex items-center justify-center">
+        <div className="h-full max-h-[80vh] aspect-[9/14] rounded-2xl overflow-hidden relative bg-black">
           <video
             ref={remoteVideoRef}
             autoPlay
@@ -194,43 +212,37 @@ export default function VideoChat() {
             className="w-full h-full object-cover"
           />
 
-          {/* CENTER STATUS */}
           {status !== "connected" && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-black/70 backdrop-blur text-sm animate-pulse">
+              <div className="px-5 py-3 rounded-full bg-black/70 flex gap-2 text-sm animate-pulse">
                 <StatusIcon className="text-pink-500" />
-                <span>{statusMap[status].text}</span>
+                {statusMap[status].text}
               </div>
             </div>
           )}
 
-          {/* LOCATION BUTTON */}
           {partnerInfo && status === "connected" && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-              <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/70 backdrop-blur border border-white/10 text-xs cursor-default">
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/70 text-xs">
                 {partnerInfo.code && (
                   <img
                     src={`https://flagcdn.com/w40/${partnerInfo.code}.png`}
-                    alt={partnerInfo.country}
-                    className="w-5 h-4 rounded-sm"
+                    className="w-5 h-4"
                   />
                 )}
                 <FiMapPin className="text-pink-500" />
-                <span>
-                  {partnerInfo.country}, {partnerInfo.state}
-                </span>
-              </button>
+                {partnerInfo.country}, {partnerInfo.state}
+              </div>
             </div>
           )}
         </div>
 
-        {/* LOCAL VIDEO */}
         <video
           ref={localVideoRef}
-          autoPlay
           muted
+          autoPlay
           playsInline
-          className={`absolute object-cover rounded-lg border border-white/30 shadow-lg
+          className={`absolute object-cover rounded-lg border border-white/30
             ${
               isMobile
                 ? "bottom-4 right-4 w-24 aspect-[9/16]"
@@ -239,30 +251,24 @@ export default function VideoChat() {
         />
       </div>
 
-      {/* CONTROLS */}
-      <div className="h-20 flex items-center justify-center gap-6 bg-black/80 border-t border-white/10">
-        {/* CAMERA */}
+      <div className="h-20 flex justify-center gap-6 items-center bg-black/80 border-t border-white/10">
         <button
           onClick={toggleCamera}
-          className={`p-3 rounded-full transition
-            ${cameraOn ? "bg-white/10" : "bg-red-600"}`}
+          className={`p-3 rounded-full ${cameraOn ? "bg-white/10" : "bg-red-600"}`}
         >
           {cameraOn ? <FiVideo /> : <FiVideoOff />}
         </button>
 
-        {/* SKIP */}
         <button
           onClick={skipPartner}
-          className="px-6 py-2 rounded-full bg-pink-600 hover:bg-pink-700 transition"
+          className="px-6 py-2 rounded-full bg-pink-600 hover:bg-pink-700"
         >
           Skip
         </button>
 
-        {/* MIC */}
         <button
           onClick={toggleMic}
-          className={`p-3 rounded-full transition
-            ${micOn ? "bg-white/10" : "bg-red-600"}`}
+          className={`p-3 rounded-full ${micOn ? "bg-white/10" : "bg-red-600"}`}
         >
           {micOn ? <FiMic /> : <FiMicOff />}
         </button>
@@ -284,10 +290,6 @@ async function getLocation() {
       code: data.country_code?.toLowerCase() || null,
     };
   } catch {
-    return {
-      country: "Unknown",
-      state: "Unknown",
-      code: null,
-    };
+    return { country: "Unknown", state: "Unknown", code: null };
   }
 }
