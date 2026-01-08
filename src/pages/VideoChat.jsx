@@ -155,7 +155,8 @@ export default function VideoChat() {
 
   function resetPeer() {
     if (peerRef.current) {
-      peerRef.current.getSenders().forEach((s) => s.track?.stop());
+      peerRef.current.ontrack = null;
+      peerRef.current.onicecandidate = null;
       peerRef.current.close();
       peerRef.current = null;
     }
@@ -183,8 +184,13 @@ export default function VideoChat() {
 
   function cleanup() {
     socketRef.current?.disconnect();
+
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
-    resetPeer();
+
+    if (peerRef.current) {
+      peerRef.current.close();
+      peerRef.current = null;
+    }
   }
 
   /* ================= STATUS ================= */
@@ -228,6 +234,7 @@ export default function VideoChat() {
                   <img
                     src={`https://flagcdn.com/w40/${partnerInfo.code}.png`}
                     className="w-5 h-4"
+                    alt=""
                   />
                 )}
                 <FiMapPin className="text-pink-500" />
