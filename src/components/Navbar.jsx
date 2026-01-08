@@ -6,7 +6,8 @@ import {
   FiMail,
   FiMenu,
   FiX,
-  FiWifi
+  FiWifi,
+  FiMessageCircle,
 } from "react-icons/fi";
 
 export default function Navbar() {
@@ -60,6 +61,13 @@ export default function Navbar() {
               <HoverGlow />
             </NavLink>
 
+            {/* ✅ TEXT CHAT */}
+            <NavLink to="/chat-text" className={navItem}>
+              <FiMessageCircle />
+              <span className="relative z-10">Text Chat</span>
+              <HoverGlow />
+            </NavLink>
+
             <NavLink
               to="/contact"
               className="ml-2 flex items-center gap-2 px-6 py-2 rounded-full
@@ -106,6 +114,15 @@ export default function Navbar() {
               className="flex items-center gap-3 text-gray-300 hover:text-white"
             >
               <FiVideo /> Video Chat
+            </NavLink>
+
+            {/* ✅ TEXT CHAT (MOBILE) */}
+            <NavLink
+              to="/chat-text"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 text-gray-300 hover:text-white"
+            >
+              <FiMessageCircle /> Text Chat
             </NavLink>
 
             <NavLink
