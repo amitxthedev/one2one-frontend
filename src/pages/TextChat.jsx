@@ -10,7 +10,7 @@ import {
     FiSkipForward,
 } from "react-icons/fi";
 
-const SOCKET_URL = "http://localhost:5000";
+const SOCKET_URL = "https://video-chat-backend-7fdm.onrender.com";
 
 export default function TextChat() {
     const socketRef = useRef(null);
