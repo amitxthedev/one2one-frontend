@@ -54,7 +54,7 @@ export default function Hero() {
 
         {/* HEADING */}
         <h1
-          className="text-4xl md:text-6xl font-extrabold mb-5 leading-tight
+          className="text-3xl md:text-6xl font-extrabold mb-5 leading-tight
                      animate-fade-up delay-100"
         >
           Talk to <span className="text-pink-500">Real People</span>
