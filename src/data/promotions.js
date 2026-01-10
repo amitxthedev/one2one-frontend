@@ -17,7 +17,7 @@ const promotions = [
       "Behind-the-scenes, user stories, and community highlights.",
     cta: "Follow Us",
     type: "page",
-    link: "https://www.instagram.com/meowhubvc/",
+    link: "https://www.instagram.com/fdghgfds/",
   },
 ];
 
