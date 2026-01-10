@@ -39,7 +39,7 @@ export default function Navbar() {
               className="text-xl font-bold tracking-wide text-pink-500
                          hover:text-pink-400 transition"
             >
-              MeowHub
+              Zomegle
             </span>
 
             <span className="hidden sm:inline text-xs text-green-400 font-medium">

@@ -23,7 +23,7 @@ export default function Footer() {
         {/* BRAND */}
         <div className="text-center md:text-left">
           <h2 className="text-2xl font-extrabold tracking-wide">
-            Meow<span className="text-pink-500">Hub</span>
+            Z<span className="text-pink-500">omegle</span>
           </h2>
           <p className="text-gray-400 text-sm mt-3 max-w-xs mx-auto md:mx-0">
             Talk to real people instantly.
