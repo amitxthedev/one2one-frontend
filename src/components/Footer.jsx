@@ -52,7 +52,7 @@ export default function Footer() {
 
       {/* COPYRIGHT */}
       <div className="relative mt-6 text-center text-xs text-gray-500">
-        © {new Date().getFullYear()} MeowHub · Made with{" "}
+        © {new Date().getFullYear()} Zomegle · Made with{" "}
         <FiHeart className="inline text-pink-500" /> in India
       </div>
     </footer>
