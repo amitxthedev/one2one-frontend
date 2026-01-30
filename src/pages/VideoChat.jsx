@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import {
   FiSearch,
@@ -11,14 +10,12 @@ import {
   FiMicOff,
   FiVideo,
   FiVideoOff,
-  FiMessageCircle,
 } from "react-icons/fi";
 
 const SOCKET_URL = "https://video-chat-backend-7fdm.onrender.com";
 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 export default function VideoChat() {
-  const navigate = useNavigate();
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const socketRef = useRef(null);
@@ -55,7 +52,7 @@ export default function VideoChat() {
     socketRef.current.on("connect", async () => {
       setStatus("finding");
       const location = await getLocation();
-      socketRef.current.emit("join", location);
+      socketRef.current.emit("join", { ...location, chatType: "video" });
       socketRef.current.emit("find-partner");
     });
 
@@ -281,14 +278,6 @@ export default function VideoChat() {
           className={`p-3 rounded-full ${micOn ? "bg-white/10" : "bg-red-600"}`}
         >
           {micOn ? <FiMic /> : <FiMicOff />}
-        </button>
-
-        <button
-          onClick={() => navigate("/chat-text")}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 transition"
-          title="Switch to Text Chat"
-        >
-          <FiMessageCircle className="text-lg" />
         </button>
       </div>
     </div>

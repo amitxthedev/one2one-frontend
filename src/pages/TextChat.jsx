@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import {
     FiSend,
@@ -9,13 +8,11 @@ import {
     FiMapPin,
     FiLoader,
     FiSkipForward,
-    FiVideo,
 } from "react-icons/fi";
 
 const SOCKET_URL = "https://video-chat-backend-7fdm.onrender.com";
 
 export default function TextChat() {
-    const navigate = useNavigate();
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
 
@@ -33,7 +30,7 @@ export default function TextChat() {
         socketRef.current.on("connect", async () => {
             setStatus("finding");
             const location = await getLocation();
-            socketRef.current.emit("join", location);
+            socketRef.current.emit("join", { ...location, chatType: "text" });
             socketRef.current.emit("find-partner");
         });
 
@@ -238,15 +235,6 @@ export default function TextChat() {
                        bg-pink-600 hover:bg-pink-700 transition"
                     >
                         <FiSend />
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() => navigate("/chat")}
-                        className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 transition"
-                        title="Switch to Video Chat"
-                    >
-                        <FiVideo />
                     </button>
                 </form>
             )}
