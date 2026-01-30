@@ -5,6 +5,10 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
+import OmegleAlternative from "./pages/seo/OmegleAlternative";
+import RandomVideoChat from "./pages/seo/RandomVideoChat";
+import VideoChatWithStrangers from "./pages/seo/VideoChatWithStrangers";
+import TalkToStrangersOnline from "./pages/seo/TalkToStrangersOnline";
 
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
@@ -53,6 +57,10 @@ function AppContent() {
           <Route path="/chat" element={<VideoChat />} />
           <Route path="/chat-text" element={<TextChat />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/omegle-alternative" element={<OmegleAlternative />} />
+          <Route path="/random-video-chat" element={<RandomVideoChat />} />
+          <Route path="/video-chat-with-strangers" element={<VideoChatWithStrangers />} />
+          <Route path="/talk-to-strangers-online" element={<TalkToStrangersOnline />} />
         </Routes>
       </div>
 
